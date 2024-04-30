@@ -17,16 +17,16 @@ def register_user(username, password):
     cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
     existing_user = cursor.fetchone()
     if existing_user:
-        print("Username already exists. Please choose a different username.")
+        print("\nUsername already exists. Please choose a different username.")
         return
 
     try:
         cursor.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
                        (username, hashed_password, 'user'))
         conn.commit()
-        print("Restaurant owner registration successful! Please log in.")
+        print("\033[92m Restaurant owner registration successful! Please log in.\033[0m")
     except sqlite3.Error as e:
-        print(f"Error registering restaurant owner: {e}")
+        print(f"\033[94mError registering restaurant owner: {e}\033[0m")
 
 
 # ----------------register Owner------------------------
@@ -37,16 +37,16 @@ def register_owner(username, password):
     cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
     existing_user = cursor.fetchone()
     if existing_user:
-        print("Username already exists. Please choose a different username.")
+        print("\nUsername already exists. Please choose a different username.")
         return
 
     try:
         cursor.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
                        (username, hashed_password, 'owner'))
         conn.commit()
-        print("Restaurant owner registration successful! Please log in.")
+        print("\033[92m Restaurant owner registration successful! Please log in.\033[0m")
     except sqlite3.Error as e:
-        print(f"Error registering restaurant owner: {e}")
+        print(f"\033[91mError registering restaurant owner: {e}\033[0m")
 
 
 # ----------------Login User------------------------
@@ -59,7 +59,7 @@ def login_user(username, password):
 
 # ----------------Add restaurant------------------------
 def add_restaurant(user_id):
-    restaurant_name = input("Enter the name of your restaurant: ")
+    restaurant_name = input("\nEnter the name of your restaurant: ")
 
     # Check if the restaurant name already exists
     cursor.execute('SELECT * FROM restaurants WHERE name = ?', (restaurant_name,))
@@ -70,7 +70,7 @@ def add_restaurant(user_id):
         # Insert new restaurant into the database
         cursor.execute('INSERT INTO restaurants (name, owner) VALUES (?, ?)', (restaurant_name, user_id))
         conn.commit()
-        print("Restaurant added successfully!")
+        print("\033[92m Restaurant added successfully!\033[0m")
 
 
 # ----------------Update Order Status------------------------
@@ -79,23 +79,23 @@ def update_order_status(order_id, new_status):
     cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,))
     order = cursor.fetchone()
     if not order:
-        print("Order not found.")
+        print("\033[91m Order not found.\033[0m")
         return
 
     # Update the status of the order
     cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (new_status, order_id))
     conn.commit()
-    print(f"Order {order_id} status updated to '{new_status}'.")
+    print(f"\033[92m Order {order_id} status updated to '{new_status}'.\033[0m")
 
 
 # ----------------Add Menu Items------------------------
 def add_menu_item(user_id):
-    restaurant_name = input("Enter the name of your restaurant: ")
+    restaurant_name = input("\nEnter the name of your restaurant: ")
     # Check if the restaurant exists and belongs to the owner
     cursor.execute('SELECT * FROM restaurants WHERE name = ? AND owner = ?', (restaurant_name, user_id))
     restaurant = cursor.fetchone()
     if not restaurant:
-        print("Restaurant not found or you do not have permission to manage this restaurant.")
+        print("\033[94m Restaurant not found or you do not have permission to manage this restaurant.\033[0m")
         return
 
     item_name = input("Enter the name of the menu item: ")
@@ -104,17 +104,17 @@ def add_menu_item(user_id):
     cursor.execute('INSERT INTO menu_items (restaurant_id, name, price) VALUES (?, ?, ?)',
                    (restaurant[0], item_name, item_price))
     conn.commit()
-    print("Menu item added successfully.")
+    print("\033[92m Menu item added successfully.\033[0m")
 
 
 # ----------------Update Menu Items------------------------
 def update_menu_item(user_id):
-    restaurant_name = input("Enter the name of your restaurant: ")
+    restaurant_name = input("\nEnter the name of your restaurant: ")
     # Check if the restaurant exists and belongs to the owner
     cursor.execute('SELECT * FROM restaurants WHERE name = ? AND owner = ?', (restaurant_name, user_id))
     restaurant = cursor.fetchone()
     if not restaurant:
-        print("Restaurant not found or you do not have permission to manage this restaurant.")
+        print("\033[94mRestaurant not found or you do not have permission to manage this restaurant.\033[0m")
         return
 
     item_name = input("Enter the name of the menu item to update: ")
@@ -123,17 +123,17 @@ def update_menu_item(user_id):
     cursor.execute('UPDATE menu_items SET price = ? WHERE restaurant_id = ? AND name = ?',
                    (new_price, restaurant[0], item_name))
     conn.commit()
-    print("Menu item updated successfully.")
+    print("\033[92m Menu item updated successfully.\033[0m")
 
 
 # ----------------Restaurant Menu------------------------
 def resturent_menu(user_id):
-    restaurant_name = input("Enter the name of your restaurant: ")
+    restaurant_name = input("\nEnter the name of your restaurant: ")
     # Check if the restaurant exists and belongs to the owner
     cursor.execute('SELECT * FROM restaurants WHERE name = ? AND owner = ?', (restaurant_name, user_id))
     restaurant = cursor.fetchone()
     if not restaurant:
-        print("Restaurant not found or you do not have permission to manage this restaurant.")
+        print("\033[94mRestaurant not found or you do not have permission to manage this restaurant.\033[0m")
         return
 
     cursor.execute('SELECT * FROM menu_items WHERE restaurant_id = ?', (restaurant[0],))
@@ -150,20 +150,20 @@ def resturent_menu(user_id):
 def browse_restaurants():
     cursor.execute('SELECT * FROM restaurants')
     restaurants = cursor.fetchall()
-    print("Available Restaurants:")
+    print("\nAvailable Restaurants:")
     for restaurant in restaurants:
         print(f"{restaurant[0]}. {restaurant[1]}")
 
     while True:
         try:
-            choice = int(input("Please enter the number of the restaurant you'd like to browse: "))
+            choice = int(input("\nPlease enter the number of the restaurant: "))
             if choice < 1 or choice > len(restaurants):
-                print("Invalid choice. Please try again.")
+                print("\033[91mInvalid choice. Please try again.\033[0m")
             else:
                 browse_menu(restaurants[choice - 1][0])
                 break
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("\033[91mInvalid input. Please enter a valid number.\033[0m")
 
 
 # ----------------Browse Menu------------------------
@@ -182,16 +182,16 @@ def browse_menu(restaurant_id):
             if choice == 0:
                 break
             elif choice < 1 or choice > len(menu_items):
-                print("Invalid choice. Please try again.")
+                print("\033[91mInvalid choice. Please try again.\033[0m")
             else:
                 quantity = int(input("Quantity: "))
                 if quantity < 1:
-                    print("Invalid quantity. Please enter a valid quantity.")
+                    print("\033[91mInvalid quantity. Please enter a valid quantity.\033[0m")
                 else:
                     cart.append((menu_items[choice - 1], quantity))
                     print(f"{menu_items[choice - 1][2]} added to cart.")
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("\033[91mInvalid input. Please enter a valid number.\033[0m")
 
     return cart
 
@@ -200,7 +200,7 @@ def browse_menu(restaurant_id):
 def view_cart():
     global cart
     if not cart:
-        print("Your cart is empty.")
+        print("\nYour cart is empty.")
         return
 
     total = 0
@@ -220,7 +220,7 @@ def view_cart():
 def place_order(user_id):
     global cart
     if not cart:
-        print("Your cart is empty. Please add items before placing an order.")
+        print("\nYour cart is empty. Please add items before placing an order.")
         return
 
     for item, quantity in cart:
@@ -229,7 +229,7 @@ def place_order(user_id):
                        (user_id, item_id, quantity, 'pending'))
 
     conn.commit()
-    print("Order placed successfully!")
+    print("\033[92m Order placed successfully!\033[0m")
     cart.clear()  # Clear cart after placing order
 
 
@@ -282,7 +282,7 @@ def owner_menu(user_id):
             print("Returning to main menu.")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("\033[91m Invalid choice. Please try again.\033[0m")
 
 
 # ----------------User Menu------------------------
@@ -301,60 +301,60 @@ def user_menu(user_id):
         elif choice == "3":
             place_order(user_id)
         elif choice == "4":
-            print("Logged out successfully. Goodbye!")
+            print("\033[95m Logged out successfully. Goodbye!\033[0m")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("\033[91m Invalid choice. Please try again.\033[0m")
 
 
 # ----------------Main Menu------------------------
 def main_menu():
-    print("\n\033[92m" + "*" * 15 + " Welcome to Our Food Ordering System! " + "*" * 15 + "\033[0m")
+    print("\n\033[96m" + "*" * 15 + " Welcome to Our Food Ordering System! " + "*" * 15 + "\033[0m")
     while True:
         print("\n1. Login as User")
         print("2. Register as User")
         print("3. Login as Restaurant Owner")
         print("4. Register as Restaurant Owner")
-        print("5. Exit")
+        print("\033[91m5. Exit\033[0m")
         choice = input("Please enter your choice: ")
 
         if choice == "1":
             # Regular user login
             username = input("Username: ")
-            password = getpass("Password: ")
+            password = getpass("Password: ")  # here I used get pass for get password from user securely.
             user = login_user(username, password)
             if user:
-                print(f"Login successful! Welcome, {username}!")
+                print(f"\033[92m Login successful! Welcome, {username}!\033[0m")
                 if user[3] != 'owner':
                     user_menu(user[0])  # Pass user_id to user_menu
                 else:
                     print("You are logged in as a restaurant owner. Switch to owner menu.")
                     owner_menu(user[0])  # Pass user_id to owner_menu
             else:
-                print("Invalid credentials. Please try again.")
+                print("\033[91mInvalid credentials. Please try again.\033[0m")
         elif choice == "2":
             # Regular user registration
             username = input("Username: ")
-            password = getpass("Password: ")
+            password = getpass("Password: ") # here I used get pass for get password from user securely.
             register_user(username, password)
-            print("Registration successful! Please log in.")
+            print("\033[92m Registration successful! Please log in.\033[0m")
         elif choice == "3":
             # Restaurant owner login
             username = input("Username: ")
-            password = getpass("Password: ")
+            password = getpass("Password: ") # here I used get pass for get password from user securely.
             user = login_user(username, password)
             if user and user[3] == 'owner':
-                print(f"Login successful! Welcome, {username}!")
+                print(f"\033[92m Login successful! Welcome, {username}!\033[0m")
                 owner_menu(user[0])  # Pass user_id to owner_menu
             else:
-                print("Invalid credentials. Please try again.")
+                print("\033[91mInvalid credentials. Please try again.\033[0m")
         elif choice == "4":
             # Restaurant owner registration
             username = input("Username: ")
-            password = getpass("Password: ")
+            password = getpass("Password: ")  # here I used get pass for get password from user securely.
             register_owner(username, password)
         elif choice == "5":
-            print("Goodbye!")
+            print("\033[95m Goodbye!\033[0m")
             break
         else:
             print("\033[91mInvalid choice. Please try again.\033[0m")
@@ -362,8 +362,6 @@ def main_menu():
 
 if __name__ == "__main__":
     main_menu()
-
-
 
 # Food ordering system
 # Code by Chathura Devinda Gamage @Sabaragamuwa University of Sri Lanka
